@@ -1,0 +1,11 @@
+{
+  "name": "apexx-backend",
+  "version": "1.0.0",
+  "description": "crash betting game",
+  "main": "./dist/index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Brian Gatundu",
+  "license": "ISC"
+}
