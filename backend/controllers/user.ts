@@ -1,21 +1,13 @@
 import { Request, Response } from "express";
-import Joi from "joi";
 import UserService from "../services/userServices";
-import { createAuthenticationCookies } from "../cookies/createCookies";
-import { kenyaPhoneNumberRegex } from "../models/user";
+import {
+  clearCookies,
+  createAuthenticationCookies,
+} from "../cookies/createCookies";
+import { loginSchema, registerSchema } from "../validation/authValidation";
+import InvalidDataError from "../utils/errors/invalidDataError";
 
 const userProvider = new UserService();
-
-const registerSchema = Joi.object({
-  username: Joi.string().required().min(4).max(10),
-  phoneNumber: Joi.string().pattern(kenyaPhoneNumberRegex).required(),
-  password: Joi.string().min(4).required(),
-});
-
-const loginSchema = Joi.object({
-  phoneNumber: Joi.string().pattern(kenyaPhoneNumberRegex).required(),
-  password: Joi.string().required(),
-});
 
 class UserController {
   constructor() {}
@@ -26,7 +18,7 @@ class UserController {
 
       if (error) {
         const errorMessage = error.details[0]?.message;
-        res.status(400).json({ error: errorMessage });
+        throw new InvalidDataError(errorMessage);
       }
 
       const { accessToken, refreshToken } = await userProvider.createUser(
@@ -35,8 +27,13 @@ class UserController {
 
       createAuthenticationCookies(res, accessToken, refreshToken);
 
-      res.json({ accessToken, refreshToken });
-    } catch (error) {}
+      res.status(200).json({ message: "Account created successfully." });
+    } catch (err) {
+      console.error("Registration Error:", err);
+
+      const code = err.code >= 400 && err.code <= 599 ? err.code : 500;
+      res.status(code).json({ error: err.message });
+    }
   };
 
   login = async (req: Request, res: Response) => {
@@ -45,18 +42,25 @@ class UserController {
 
       if (error) {
         const errorMessage = error.details[0]?.message;
-        res.status(400).json({ error: errorMessage });
+        throw new InvalidDataError(errorMessage);
       }
 
       const { accessToken, refreshToken } = await userProvider.login(value);
 
       createAuthenticationCookies(res, accessToken, refreshToken);
 
-      res.json({ accessToken, refreshToken });
-    } catch (error) {
-      console.log(error);
-      res.status(500).json(error);
+      res.status(200).json({ message: "logged in successfully" });
+    } catch (err) {
+      console.error("Login Error:", err);
+
+      const code = err.code >= 400 && err.code <= 599 ? err.code : 500;
+      res.status(code).json({ error: err.message });
     }
+  };
+
+  logout = async (req: Request, res: Response) => {
+    clearCookies(res);
+    res.status(200).json({ message: "Successfully logged out" });
   };
 }
 

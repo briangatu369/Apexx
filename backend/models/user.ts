@@ -1,8 +1,8 @@
 import mongoose, { Document, Model, model } from "mongoose";
 import jwt from "jsonwebtoken";
 import bycrpt from "bcryptjs";
-
-export const kenyaPhoneNumberRegex = /^(07|01)\d{8}$/;
+import { kenyaPhoneNumberRegex } from "../validation/authValidation";
+import NotFoundError from "../utils/errors/notFoundError";
 
 interface UserInterface extends Document {
   username: string;
@@ -26,7 +26,11 @@ interface UserStaticMethods extends Model<UserInterface> {
 
 const userSchema = new mongoose.Schema(
   {
-    username: { type: String, unique: true, required: true },
+    username: {
+      type: String,
+      unique: [true, "User name already in use."],
+      required: true,
+    },
     profileImage: { type: String, default: "" },
     role: {
       type: String,
@@ -35,7 +39,7 @@ const userSchema = new mongoose.Schema(
     },
     phoneNumber: {
       type: String,
-      unique: true,
+      unique: [true, "User with phone number already exist."],
       match: [kenyaPhoneNumberRegex, "Invalid phone Number"],
       required: true,
     },
@@ -59,13 +63,13 @@ userSchema.statics.findByCred = async function (
   const user = await User.findOne({ phoneNumber });
 
   if (!user) {
-    throw new Error("User not found");
+    throw new NotFoundError("User not found.");
   }
 
   const isMatch = await bycrpt.compare(password, user.password);
 
   if (!isMatch) {
-    throw new Error("Incorrect Password");
+    throw new NotFoundError("Wrong Password.");
   }
 
   return user;

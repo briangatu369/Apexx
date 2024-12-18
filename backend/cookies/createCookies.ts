@@ -24,3 +24,17 @@ export const createAuthenticationCookies = (
     secure: false,
   });
 };
+
+export const clearCookies = (res: Response) => {
+  res.clearCookie("access-token", {
+    httpOnly: true,
+    sameSite: "strict",
+    secure: false,
+  });
+
+  res.clearCookie("refresh-token", {
+    httpOnly: true,
+    sameSite: "strict",
+    secure: false,
+  });
+};

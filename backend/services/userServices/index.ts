@@ -1,5 +1,7 @@
 import User from "../../models/user";
 import bycrpt from "bcryptjs";
+import NotFoundError from "../../utils/errors/notFoundError";
+import InternalServerError from "../../utils/errors/internalServerError";
 
 class UserService {
   constructor() {}
@@ -19,7 +21,7 @@ class UserService {
     let { accessToken, refreshToken } = user.generateAuthToken();
 
     if (!accessToken || !refreshToken) {
-      throw new Error("Failed to create user");
+      throw new InternalServerError("Internal server Error.");
     }
 
     await user.save();
@@ -31,14 +33,13 @@ class UserService {
     const user = await User.findByCred(userData.phoneNumber, userData.password);
 
     if (!user) {
-      throw new Error("User not found");
+      throw new NotFoundError("User not found.");
     }
 
-    console.log(user);
     const { accessToken, refreshToken } = await user.generateAuthToken();
 
     if (!accessToken || !refreshToken) {
-      throw new Error("Failed to login");
+      throw new InternalServerError("Internal server Error.");
     }
 
     return { accessToken, refreshToken };
