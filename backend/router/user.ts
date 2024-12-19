@@ -5,9 +5,9 @@ const userController = new UserController();
 
 const router = Router();
 
-router.get("/register", userController.createUser);
+router.post("/register", userController.createUser);
 
-router.get("/login", userController.login);
+router.post("/login", userController.login);
 
 router.get("/logout", userController.logout);
 

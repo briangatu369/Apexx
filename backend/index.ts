@@ -1,22 +1,29 @@
-import express from "express";
+import { httpServer, io } from "./config/serverSetup";
 import connectDb from "./db/mongoDbConnect";
-import userRouter from "./router/user";
 
-const app = express();
-
-app.use(express.json());
-
-app.use("/api/user-service", userRouter);
+const PORT = process.env.PORT || 4000;
+const MONGODB_URI =
+  process.env.MONGODB_URI || "mongodb://localhost:27017/apexx";
 
 const startServer = async () => {
   try {
-    await connectDb("mongodb://localhost:27017/apexx");
+    await connectDb(MONGODB_URI);
 
-    app.listen(4000, () => {
-      console.log("the server is running");
+    io.on("connection", (socket) => {
+      console.log("Client connected");
+
+      socket.on("disconnect", () => {
+        console.log("Client disconnected");
+      });
+    });
+
+    // Start server
+    httpServer.listen(PORT, () => {
+      console.log(`Server running on port ${PORT}`);
     });
   } catch (error) {
-    console.error(error);
+    console.error("Failed to start server:", error);
+    process.exit(1);
   }
 };
 
