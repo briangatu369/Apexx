@@ -1,7 +1,7 @@
 import crypto from "crypto";
 import InternalServerError from "../../utils/errors/internalServerError";
 
-class UserServices {
+class GameServices {
   private static readonly MAX_MULTIPLIER = 10000;
   private static readonly HOUSE_EDGE = 0.01;
   private static readonly PREFIX_LENGTH = 8;
@@ -63,7 +63,7 @@ class UserServices {
       HOUSE_EDGE,
       PREFIX_LENGTH,
       MULTIPLIER_TUNING_FACTOR,
-    } = UserServices;
+    } = GameServices;
     const maxNumericValue = 2 ** ((PREFIX_LENGTH / 2) * 8) - 1;
 
     const hashPrefix = this.multiplierData.gameSessionHash.substring(
@@ -137,4 +137,4 @@ class UserServices {
   }
 }
 
-export default UserServices;
+export default GameServices;
