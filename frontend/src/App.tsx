@@ -1,14 +1,22 @@
-import { io } from "socket.io-client";
-import Login from "./Pages/auth/Login/Login";
-import Register from "./Pages/auth/Register/Register";
+import NavBar from "./components/NavBar";
 
 function App() {
-  const socket = io("http://localhost:4000");
+  // const socket = io("http://localhost:4000");
+  // const [hashedServerSeed, setHashedServerSeed] = useState("");
+  // const [currentMultiplier, setCurrentMultiplier] = useState(0);
+
+  // useEffect(() => {
+  //   socket.on("game:broadcastHashedServerSeed", (data) => {
+  //     setHashedServerSeed(data.hashedServerSeed);
+  //   });
+  //   socket.on("game:broadcastCurrentMultiplier", (data) => {
+  //     setCurrentMultiplier(data.currentMultiplier);
+  //   });
+  // }, []);
+
   return (
-    <div className="text-white">
-      <h1 className="text-white">apexx</h1>
-      <Register />
-      <Login />
+    <div className="text-white ">
+      <NavBar />
     </div>
   );
 }
