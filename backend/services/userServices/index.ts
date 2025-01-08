@@ -2,6 +2,7 @@ import User from "../../models/user";
 import bycrpt from "bcryptjs";
 import NotFoundError from "../../utils/errors/notFoundError";
 import InternalServerError from "../../utils/errors/internalServerError";
+import InvalidDataError from "../../utils/errors/invalidDataError";
 
 class UserService {
   constructor() {}
@@ -11,6 +12,12 @@ class UserService {
     const saltRounds = 10;
 
     const hashedPassword = await bycrpt.hash(password, saltRounds);
+
+    const userExist = await User.findOne({ phoneNumber, username });
+
+    if (userExist) {
+      throw new InvalidDataError("User already exist.");
+    }
 
     const user = new User({
       phoneNumber,
