@@ -1,6 +1,6 @@
 const InputError = ({ errorMessage }: { errorMessage: string | undefined }) => {
   return (
-    <p className="text-bright-red text-[13px] text-sm font-semibold tracking-wide">
+    <p className="text-bright-red text-[12px] text-sm font-medium tracking-wide">
       {errorMessage}
     </p>
   );

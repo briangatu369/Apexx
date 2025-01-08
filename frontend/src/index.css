@@ -20,11 +20,11 @@
   --primary-yellow: #facc15;
   --dusky-blue: #465a7e66;
   --rust-brown: #422006;
-  --dark-brown: #0c0a09;
+  --dark-brown: #181211ce;
   --bright-red: #e02424;
 }
 body {
-  background-color: #0a1b15;
+  background-color: black;
   color: #fff;
 }
 

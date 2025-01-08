@@ -7,14 +7,18 @@ import {
   DialogHeader,
   DialogTitle,
   DialogFooter,
+  DialogDescription,
 } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
-import { IoIosCreate } from "react-icons/io";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { registerSchema } from "@/validations/authSchema";
 import { useForm } from "react-hook-form";
 import InputError from "@/components/InputError";
 import { IoCreateOutline } from "react-icons/io5";
+import { Loader2 } from "lucide-react";
+import { twMerge } from "tailwind-merge";
+import { toast } from "sonner";
+import { handleTryCatchErrors } from "@/utils/handleErrors";
 
 interface RegisterI {
   username: string;
@@ -34,7 +38,8 @@ const Register = ({
   const {
     register,
     handleSubmit,
-    formState: { errors },
+    reset,
+    formState: { errors, isSubmitting },
   } = useForm({
     defaultValues: {
       phoneNumber: "",
@@ -46,22 +51,29 @@ const Register = ({
   const onSubmit = async (values: RegisterI) => {
     try {
       await api.post("/user-service/register", values);
-    } catch (error) {
-      console.log(error);
+      toast.success("Account created successfully");
+      onClose();
+      reset();
+    } catch (error: unknown) {
+      handleTryCatchErrors(error, "Registration failed");
     }
   };
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <div></div>
       <DialogContent
+        onInteractOutside={(e) => {
+          e.preventDefault();
+        }}
         hideClose={false}
-        className="sm:max-w-[400px] border-none bg-dark-brown"
+        className="sm:px-9 sm:max-w-80"
       >
         <DialogHeader className="hidden">
           <DialogTitle></DialogTitle>
+          <DialogDescription></DialogDescription>
         </DialogHeader>
 
+        {/* form */}
         <form onSubmit={handleSubmit(onSubmit)}>
           <div className="py-2">
             <h1 className="text-center tracking-wide font-semibold text-xl">
@@ -74,6 +86,7 @@ const Register = ({
               <Label htmlFor="phoneNumber">Phone Number</Label>
               <Input
                 {...register("phoneNumber")}
+                disabled={isSubmitting}
                 id="phoneNumber"
                 type="tel"
                 placeholder="e.g 07xx-xxx-xxx"
@@ -82,13 +95,14 @@ const Register = ({
               <InputError errorMessage={errors.phoneNumber?.message} />
             </div>
 
-            {/* phone number */}
+            {/* username */}
             <div className="grid gap-1">
               <Label htmlFor="phoneNumber">Username</Label>
               <Input
                 {...register("username")}
+                disabled={isSubmitting}
                 id="username"
-                type="tel"
+                type="text"
                 placeholder="e.g shadow070"
                 className="col-span-3"
               />
@@ -100,6 +114,7 @@ const Register = ({
               <Label htmlFor="password">Password</Label>
               <Input
                 {...register("password")}
+                disabled={isSubmitting}
                 id="password"
                 type="password"
                 placeholder="••••••••"
@@ -108,20 +123,33 @@ const Register = ({
               <InputError errorMessage={errors.password?.message} />
             </div>
           </div>
+
+          {/* footer */}
           <DialogFooter>
             <div>
-              <Button type="submit">
+              <Button
+                type="submit"
+                className={twMerge(
+                  isSubmitting &&
+                    "bg-slate-700 text-white/40 cursor-not-allowed"
+                )}
+              >
                 <span>Register</span>
-                <IoCreateOutline />
+                {isSubmitting ? (
+                  <Loader2 className="animate-spin" />
+                ) : (
+                  <IoCreateOutline />
+                )}
               </Button>
               <div className="flex flex-col gap-3 mt-3">
                 <Button
+                  disabled={isSubmitting}
                   onClick={toggleModals}
                   type="button"
                   variant={"link"}
                   className=" w-fit p-0 h-fit"
                 >
-                  Already have an account?Login instead.
+                  Login instead.
                 </Button>
               </div>
             </div>

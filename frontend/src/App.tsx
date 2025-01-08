@@ -1,4 +1,5 @@
-import NavBar from "./components/NavBar";
+import { Toaster } from "sonner";
+import NavBar from "./components/NavBar/Index";
 
 function App() {
   // const socket = io("http://localhost:4000");
@@ -17,6 +18,7 @@ function App() {
   return (
     <div className="text-white ">
       <NavBar />
+      <Toaster richColors position="top-center" />
     </div>
   );
 }

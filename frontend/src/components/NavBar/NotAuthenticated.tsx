@@ -1,7 +1,7 @@
 import { useCallback, useState } from "react";
 import { Button } from "../ui/button";
-import Login from "@/Pages/auth/Login/Login";
-import Register from "@/Pages/auth/Register/Register";
+import Login from "@/Pages/auth/Login/Index";
+import Register from "@/Pages/auth/Register/Index";
 
 const NotAuthenticated = () => {
   const [isLoginOpen, setIsLoginOpen] = useState(false);
@@ -13,7 +13,7 @@ const NotAuthenticated = () => {
   }, []);
 
   return (
-    <div className="flex gap-4">
+    <div className="flex">
       {/* modal buttons */}
       <Button
         variant="ghost"

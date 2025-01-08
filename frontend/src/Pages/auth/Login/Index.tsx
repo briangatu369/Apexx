@@ -7,6 +7,7 @@ import {
   DialogHeader,
   DialogTitle,
   DialogFooter,
+  DialogDescription,
 } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { TbLogin2 } from "react-icons/tb";
@@ -14,6 +15,10 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import { loginSchema } from "@/validations/authSchema";
 import { useForm } from "react-hook-form";
 import InputError from "@/components/InputError";
+import { Loader2 } from "lucide-react";
+import { twMerge } from "tailwind-merge";
+import { toast } from "sonner";
+import { handleTryCatchErrors } from "@/utils/handleErrors";
 
 interface LoginI {
   phoneNumber: string;
@@ -32,7 +37,8 @@ const Login = ({
   const {
     register,
     handleSubmit,
-    formState: { errors },
+    reset,
+    formState: { errors, isSubmitting },
   } = useForm({
     defaultValues: {
       phoneNumber: "",
@@ -44,22 +50,29 @@ const Login = ({
   const onSubmit = async (values: LoginI) => {
     try {
       await api.post("/user-service/login", values);
+      toast.success("LoggedIn successfully");
+      onClose();
+      reset();
     } catch (error) {
-      console.log(error);
+      handleTryCatchErrors(error, "Login failed");
     }
   };
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <div></div>
       <DialogContent
+        onInteractOutside={(e) => {
+          e.preventDefault();
+        }}
         hideClose={false}
-        className="sm:max-w-[400px] border-none bg-dark-brown"
+        className="sm:px-9 sm:max-w-80"
       >
         <DialogHeader className="hidden">
           <DialogTitle></DialogTitle>
+          <DialogDescription></DialogDescription>
         </DialogHeader>
 
+        {/* form */}
         <form onSubmit={handleSubmit(onSubmit)}>
           <div className="py-2">
             <h1 className="text-center tracking-wide font-semibold text-xl">
@@ -72,6 +85,7 @@ const Login = ({
               <Label htmlFor="phoneNumber">Phone Number</Label>
               <Input
                 {...register("phoneNumber")}
+                disabled={isSubmitting}
                 id="phoneNumber"
                 type="tel"
                 placeholder="e.g 07xx-xxx-xxx"
@@ -85,6 +99,7 @@ const Login = ({
               <Label htmlFor="password">Password</Label>
               <Input
                 {...register("password")}
+                disabled={isSubmitting}
                 id="password"
                 type="password"
                 placeholder="••••••••"
@@ -93,14 +108,27 @@ const Login = ({
               <InputError errorMessage={errors.password?.message} />
             </div>
           </div>
+
+          {/* footer */}
           <DialogFooter>
             <div>
-              <Button type="submit">
+              <Button
+                type="submit"
+                className={twMerge(
+                  isSubmitting &&
+                    "bg-slate-700 text-white/40 cursor-not-allowed"
+                )}
+              >
                 <span>Login</span>
-                <TbLogin2 />
+                {isSubmitting ? (
+                  <Loader2 className="animate-spin" />
+                ) : (
+                  <TbLogin2 />
+                )}
               </Button>
               <div className="flex flex-col gap-3 mt-3">
                 <Button
+                  disabled={isSubmitting}
                   onClick={toggleModals}
                   type="button"
                   variant={"link"}
@@ -109,6 +137,7 @@ const Login = ({
                   Create Account.
                 </Button>
                 <Button
+                  disabled={isSubmitting}
                   type="button"
                   variant={"link"}
                   className=" w-fit p-0 h-fit"
