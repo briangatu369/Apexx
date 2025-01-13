@@ -13,4 +13,6 @@ export const handleTryCatchErrors = (error: unknown, fallbackError: string) => {
   } else {
     toast.error("An unexpected error occurred");
   }
+
+  console.error(error);
 };
