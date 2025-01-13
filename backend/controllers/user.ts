@@ -30,7 +30,6 @@ class UserController {
       res.status(200).json({ message: "Account created successfully." });
     } catch (err) {
       console.error("Registration Error:", err);
-
       const code = err.code >= 400 && err.code <= 599 ? err.code : 500;
       res.status(code).json({ error: err.message });
     }
