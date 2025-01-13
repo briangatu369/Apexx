@@ -1,4 +1,4 @@
-import mongoose, { Document } from "mongoose";
+import mongoose, { Document, Types } from "mongoose";
 
 export enum GameState {
   RUNNING = "RUNNING",
@@ -14,13 +14,13 @@ enum ProfitStatus {
 }
 
 interface Player {
-  userId: string;
+  userId: Types.ObjectId;
   sessionId: string;
   username: string;
   stake: number;
   cashoutMultiplier: number | null;
   payout: number | null;
-  betId: string | unknown;
+  betId: Types.ObjectId;
 }
 
 export interface GameSession {
@@ -41,7 +41,7 @@ interface GameSessionDocument extends GameSession, Document {}
 
 const PlayerSchema = new mongoose.Schema<Player>({
   userId: {
-    type: String,
+    type: mongoose.Schema.Types.ObjectId,
     required: true,
   },
   username: {

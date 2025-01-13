@@ -1,13 +1,19 @@
-import mongoose from "mongoose";
+import mongoose, { Types } from "mongoose";
 import { Document } from "mongoose";
-import { GameState } from "./sessionAnalytics";
+
+export enum BetState {
+  CASHEDOUT = "cashedout",
+  ACTIVE = "active",
+  BUSTED = "busted",
+}
 
 interface BetHistoryI extends Document {
-  userId: mongoose.Schema.Types.ObjectId;
+  _id: Types.ObjectId;
+  userId: Types.ObjectId;
   betId: string;
   sessionId: string;
   stake: number;
-  status: GameState;
+  status: BetState;
   cashoutMultiplier: number | null;
   payout: number | null;
 }
@@ -22,8 +28,8 @@ const betHistorySchema = new mongoose.Schema<BetHistoryI>(
     sessionId: { type: String, required: true },
     status: {
       type: String,
-      enum: Object.values(GameState),
-      default: GameState.RUNNING,
+      enum: Object.values(BetState),
+      default: BetState.ACTIVE,
     },
     stake: { type: Number, required: true },
     cashoutMultiplier: { type: Number, default: null },
