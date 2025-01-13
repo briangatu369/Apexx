@@ -1,9 +1,12 @@
 import { httpServer, io } from "./config/serverSetup";
 import connectDb from "./db/mongoDbConnect";
+import GameSessionManager from "./services/gameServices/gameSessionManager";
 
 const PORT = process.env.PORT || 4000;
 const MONGODB_URI =
   process.env.MONGODB_URI || "mongodb://localhost:27017/apexx";
+
+const gameSession = new GameSessionManager();
 
 const startServer = async () => {
   try {
