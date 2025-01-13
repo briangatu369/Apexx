@@ -6,15 +6,21 @@ export enum GameState {
   CRASHED = "CRASHED",
 }
 
-// Base interfaces that can be used anywhere
-export interface Player {
-  readonly playerId: string;
-  readonly username: string;
-  readonly betAmount: number;
+enum ProfitStatus {
+  PROFIT = "PROFIT",
+  LOSS = "LOSS",
+  BREAK_EVEN = "BREAK_EVEN",
+  PENDING = "PENDING",
+}
+
+interface Player {
+  userId: string;
+  sessionId: string;
+  username: string;
+  stake: number;
   cashoutMultiplier: number | null;
-  cashoutAmount: number | null;
-  profitOrLoss: number | null;
-  cashoutTime: Date | null;
+  payout: number | null;
+  betId: string | unknown;
 }
 
 export interface GameSession {
@@ -31,10 +37,10 @@ export interface GameSession {
   totalPlayers: number;
 }
 
-export interface GameSessionDocument extends GameSession, Document {}
+interface GameSessionDocument extends GameSession, Document {}
 
 const PlayerSchema = new mongoose.Schema<Player>({
-  playerId: {
+  userId: {
     type: String,
     required: true,
   },
@@ -42,7 +48,7 @@ const PlayerSchema = new mongoose.Schema<Player>({
     type: String,
     required: true,
   },
-  betAmount: {
+  stake: {
     type: Number,
     required: true,
   },
@@ -50,16 +56,8 @@ const PlayerSchema = new mongoose.Schema<Player>({
     type: Number,
     default: null,
   },
-  cashoutAmount: {
+  payout: {
     type: Number,
-    default: null,
-  },
-  profitOrLoss: {
-    type: Number,
-    default: null,
-  },
-  cashoutTime: {
-    type: Date,
     default: null,
   },
 });
@@ -107,7 +105,7 @@ const sessionAnalyticsSchema = new mongoose.Schema<GameSessionDocument>(
       default: null,
     },
     players: {
-      type: [PlayerSchema],
+      type: [],
       required: true,
       default: [],
     },

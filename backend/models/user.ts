@@ -24,7 +24,7 @@ interface UserStaticMethods extends Model<UserInterface> {
   findByCred: (phoneNumber: string, password: string) => Promise<UserInterface>;
 }
 
-const userSchema = new mongoose.Schema(
+const userSchema = new mongoose.Schema<UserInterface>(
   {
     username: {
       type: String,
@@ -43,7 +43,11 @@ const userSchema = new mongoose.Schema(
       match: [kenyaPhoneNumberRegex, "Invalid phone Number"],
       required: true,
     },
-    balance: { type: Number, default: 0 },
+    balance: {
+      type: Number,
+      default: 0,
+      min: [0, "Balance cannot be negative"],
+    },
     accountStatus: {
       type: String,
       enum: ["active", "locked", "suspended"],

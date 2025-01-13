@@ -4,8 +4,9 @@ import { GameState } from "./sessionAnalytics";
 
 interface BetHistoryI extends Document {
   userId: mongoose.Schema.Types.ObjectId;
+  betId: string;
   sessionId: string;
-  betAmount: number;
+  stake: number;
   status: GameState;
   cashoutMultiplier: number | null;
   payout: number | null;
@@ -19,8 +20,12 @@ const betHistorySchema = new mongoose.Schema<BetHistoryI>(
       required: true,
     },
     sessionId: { type: String, required: true },
-    status: { enum: Object.values(GameState), default: GameState.RUNNING },
-    betAmount: { type: Number, required: true },
+    status: {
+      type: String,
+      enum: Object.values(GameState),
+      default: GameState.RUNNING,
+    },
+    stake: { type: Number, required: true },
     cashoutMultiplier: { type: Number, default: null },
     payout: { type: Number, default: null },
   },
