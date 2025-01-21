@@ -41,7 +41,7 @@ class MultiplierGenerator {
     { min: 100, max: null, label: "100x+" },
   ];
 
-  protected multiplierData: MultiplierData = {
+  multiplierData: MultiplierData = {
     serverSeed: null,
     hashedServerSeed: null,
     gameSessionHash: null,
@@ -98,6 +98,10 @@ class MultiplierGenerator {
     };
 
     return gameSessionHash;
+  }
+
+  getMultiplierData() {
+    return this.multiplierData;
   }
 
   /**
