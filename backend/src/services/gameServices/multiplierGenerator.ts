@@ -1,6 +1,6 @@
 import crypto from "crypto";
 import GAME_CONFIG from "../../config/gameConfig";
-import GameError from "../../utils/erros/gameError";
+import GameError from "../../utils/errors/gameError";
 
 interface MultiplierInfo {
   readonly serverSeed: string | null; //
