@@ -27,7 +27,7 @@ export interface GameSession {
   hashedServerSeed: string;
   clientSeedDetails: ClientSeedDetails[];
   clientSeed: string;
-  gameSessionHash: string;
+  gameHash: string;
   rawCrashPoint: number | null;
   finalCrashPoint: number | null;
   totalPlayers: number;
@@ -76,7 +76,7 @@ const gameSessionAnalyticsSchema = new Schema<GameSessionDocument>(
       type: [{ username: String, clientSeed: String }],
       required: true,
     },
-    gameSessionHash: { type: String, required: true },
+    gameHash: { type: String, required: true },
     rawCrashPoint: { type: Number, required: true, min: 1 },
     finalCrashPoint: { type: Number, required: true, min: 1 },
     totalPlayers: { type: Number, required: true, default: 0, min: 0 },
