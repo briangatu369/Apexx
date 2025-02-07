@@ -6,8 +6,10 @@ import {
   clearCookies,
   createAuthenticationCookies,
 } from "../utils/auth/cookies";
-import User, { UserInterface } from "../models/user";
-const userProvider = new UserService();
+import { UserInterface } from "../models/user";
+import { isSpecificError } from "../utils/errorTypeChecker";
+
+const userServices = new UserService();
 
 interface UserResponse {
   phoneNumber: string;
@@ -29,7 +31,7 @@ class UserController {
         throw new AuthError({ description: errorMessage });
       }
 
-      const { accessToken, refreshToken, user } = await userProvider.createUser(
+      const { accessToken, refreshToken, user } = await userServices.createUser(
         value
       );
 
@@ -42,7 +44,10 @@ class UserController {
         .json({ message: "Account created successfully.", userData });
     } catch (err) {
       console.error("Registration Error:", err);
-      const code = err.code >= 400 && err.code <= 599 ? err.code : 500;
+
+      const isAuthError = isSpecificError(err, AuthError);
+      const code = isAuthError ? err.httpCode : 500;
+
       res.status(code).json({ error: err.message });
     }
   };
@@ -56,7 +61,7 @@ class UserController {
         throw new AuthError({ description: errorMessage });
       }
 
-      const { accessToken, refreshToken, user } = await userProvider.login(
+      const { accessToken, refreshToken, user } = await userServices.login(
         value
       );
 
@@ -68,14 +73,16 @@ class UserController {
     } catch (err) {
       console.error("Login Error:", err);
 
-      const code = err.code >= 400 && err.code <= 599 ? err.code : 500;
+      const isAuthError = isSpecificError(err, AuthError);
+      const code = isAuthError ? err.httpCode : 500;
+
       res.status(code).json({ error: err.message });
     }
   };
 
   logout = async (req: Request, res: Response) => {
     clearCookies(res);
-    res.status(200).json({ message: "Successfully logged out" });
+    res.status(200).json({ message: "Loggedout successfully" });
   };
 
   private mapUserToResponse(user: UserInterface): UserResponse {
