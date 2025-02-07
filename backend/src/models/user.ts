@@ -1,8 +1,13 @@
-import mongoose, { Document } from "mongoose";
+import mongoose, { Document, Model, model } from "mongoose";
+import bcrypt from "bcrypt";
+import jwt from "jsonwebtoken";
 import { kenyaPhoneNumberRegex } from "../validations/auth";
+import { maxAgeAccess, maxAgeRefresh } from "../utils/auth/cookies";
+import AuthError from "../utils/errors/authError";
 
 export interface UserInterface extends Document {
   username: string;
+  profileImage: string;
   role: "user" | "admin";
   phoneNumber: string;
   balance: number;
@@ -14,6 +19,10 @@ export interface UserInterface extends Document {
   generateAuthToken: () => any;
 }
 
+interface UserStaticMethods extends Model<UserInterface> {
+  findByCred: (phoneNumber: string, password: string) => Promise<UserInterface>;
+}
+
 const userSchema = new mongoose.Schema<UserInterface>(
   {
     username: {
@@ -21,6 +30,7 @@ const userSchema = new mongoose.Schema<UserInterface>(
       unique: [true, "User name already in use."],
       required: true,
     },
+    profileImage: { type: String, default: "" },
     role: {
       type: String,
       enum: ["user", "admin"],
@@ -49,6 +59,38 @@ const userSchema = new mongoose.Schema<UserInterface>(
   { timestamps: true }
 );
 
-const User = mongoose.model("User", userSchema);
+userSchema.statics.findByCred = async function (
+  phoneNumber: string,
+  password: string
+) {
+  const user = await User.findOne({ phoneNumber });
+
+  if (!user) {
+    throw new Error("User not found.");
+  }
+
+  const isMatch = await bcrypt.compare(password, user.password);
+
+  if (!isMatch) {
+    throw new AuthError({ description: "Wrong password" });
+  }
+
+  return user;
+};
+
+userSchema.methods.generateAuthToken = function () {
+  const user = this?._doc;
+
+  const jwtData = { phoneNumber: user.phoneNumber, username: user.username };
+
+  const accessToken = jwt.sign(jwtData, "12345", { expiresIn: maxAgeAccess });
+  const refreshToken = jwt.sign(jwtData, "54321", {
+    expiresIn: maxAgeRefresh,
+  });
+
+  return { accessToken, refreshToken };
+};
+
+const User = model<UserInterface, UserStaticMethods>("User", userSchema);
 
 export default User;
