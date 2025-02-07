@@ -25,7 +25,7 @@ class UserService {
     const userExist = await User.findOne({ phoneNumber, username });
 
     if (userExist) {
-      throw new AuthError({ description: "User already exist" });
+      throw new AuthError({ description: "User already exist", httpCode: 404 });
     }
 
     const user = new User({
@@ -40,6 +40,7 @@ class UserService {
       throw new AuthError({
         description: "An error occured. Please try again",
         internalDetails: "Failed to generate auth tokens",
+        httpCode: 500,
       });
     }
 
@@ -52,7 +53,7 @@ class UserService {
     const user = await User.findByCred(userData.phoneNumber, userData.password);
 
     if (!user) {
-      throw new AuthError({ description: "User not found" });
+      throw new AuthError({ description: "User not found", httpCode: 404 });
     }
 
     const { accessToken, refreshToken } = await user.generateAuthToken();
@@ -61,6 +62,7 @@ class UserService {
       throw new AuthError({
         description: "An error occured. Please try again",
         internalDetails: "Failed to generate auth tokens",
+        httpCode: 500,
       });
     }
 
