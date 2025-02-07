@@ -28,7 +28,7 @@ class UserController {
 
       if (error) {
         const errorMessage = error.details[0]?.message;
-        throw new AuthError({ description: errorMessage });
+        throw new AuthError({ description: errorMessage, httpCode: 400 });
       }
 
       const { accessToken, refreshToken, user } = await userServices.createUser(
@@ -58,7 +58,7 @@ class UserController {
 
       if (error) {
         const errorMessage = error.details[0]?.message;
-        throw new AuthError({ description: errorMessage });
+        throw new AuthError({ description: errorMessage, httpCode: 400 });
       }
 
       const { accessToken, refreshToken, user } = await userServices.login(
@@ -73,6 +73,21 @@ class UserController {
     } catch (err) {
       console.error("Login Error:", err);
 
+      const isAuthError = isSpecificError(err, AuthError);
+      const code = isAuthError ? err.httpCode : 500;
+
+      res.status(code).json({ error: err.message });
+    }
+  };
+
+  verifyUserAuthentication = async (req: Request, res: Response) => {
+    try {
+      const userInfo = req.user;
+
+      const user = await userServices.verifyAuthentication(userInfo);
+      const userData = this.mapUserToResponse(user);
+      res.status(200).json({ message: "Authenticated", userData });
+    } catch (err) {
       const isAuthError = isSpecificError(err, AuthError);
       const code = isAuthError ? err.httpCode : 500;
 

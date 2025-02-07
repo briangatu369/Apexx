@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from "express";
 import jwt from "jsonwebtoken";
 
-interface UserPayload {
+interface JwtPayload {
   phoneNumber: string;
   username: string;
 }
@@ -9,7 +9,7 @@ interface UserPayload {
 declare global {
   namespace Express {
     interface Request {
-      user?: UserPayload;
+      user?: JwtPayload;
     }
   }
 }
@@ -23,7 +23,7 @@ const validateJwt = (req: Request, res: Response, next: NextFunction) => {
       return;
     }
 
-    const decoded = jwt.verify(accessToken, "12345") as UserPayload;
+    const decoded = jwt.verify(accessToken, "12345") as JwtPayload;
     req.user = decoded;
     next();
   } catch (err) {

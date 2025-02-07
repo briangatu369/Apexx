@@ -1,4 +1,4 @@
-import User from "../../models/user";
+import User, { UserInterface } from "../../models/user";
 import bcrypt from "bcrypt";
 import AuthError from "../../utils/errors/authError";
 
@@ -67,6 +67,29 @@ class UserService {
     }
 
     return { accessToken, refreshToken, user };
+  };
+
+  verifyAuthentication = async (
+    userInfo: Express.Request["user"]
+  ): Promise<UserInterface> => {
+    const user = await User.findOne({
+      phoneNumber: userInfo?.phoneNumber,
+    });
+
+    if (!user) {
+      throw new AuthError({
+        description: "Failed to authenticate",
+        httpCode: 404,
+      });
+    }
+
+    if (user?.accountStatus !== "active") {
+      throw new AuthError({
+        description: `The account is ${user?.accountStatus}.Please contact support`,
+      });
+    }
+
+    return user;
   };
 
   logout = () => {};
