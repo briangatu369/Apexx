@@ -11,4 +11,4 @@ router.post("/login", userController.login);
 router.post("/verifyjwt", validateJwt, userController.verifyUserAuthentication);
 router.get("/logout", userController.logout);
 
-export default router;
+export { router as UserRouter };

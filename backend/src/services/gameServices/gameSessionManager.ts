@@ -6,7 +6,7 @@ import SessionAnalytics, {
   GamePhase,
 } from "../../models/game/gameSessionAnalytics";
 import { v4 as uuidv4 } from "uuid";
-import SOCKET_EVENT_NAMES from "../../config/socketNamesConfig";
+import SOCKET_EVENT_NAMES from "../../config/socketEventNamesConfig";
 import mongoose from "mongoose";
 import BetHistory, { BetState } from "../../models/game/betHistory";
 import GameError from "../../utils/errors/gameError";
@@ -19,7 +19,7 @@ interface GameSessionSchedulers {
   timeouts: Record<string, NodeJS.Timeout | null>;
 }
 
-export interface BetInMemory {
+export interface SingleBet {
   userId: string;
   username: string;
   stake: number;
@@ -32,7 +32,7 @@ interface GameSessionInMemory {
   clientSeed: string;
   clientSeedDetails: ClientSeedDetails[];
   gamePhase: GamePhase;
-  bets: BetInMemory[];
+  bets: SingleBet[];
   totalBetAmount: number;
   totalPlayers: number;
   currentMultiplier: number;
@@ -162,10 +162,6 @@ class GameSessionManager {
 
   private incrementMultiplier() {
     try {
-      const growthRate = 0.0035;
-      const increment = this.sessionData.currentMultiplier * growthRate;
-      this.sessionData.currentMultiplier += increment;
-
       if (
         this.sessionData.currentMultiplier >=
         this.multiplierGenerator.multiplierData.finalCrashPoint!
@@ -174,6 +170,10 @@ class GameSessionManager {
         this.endSession();
         return;
       }
+
+      const growthRate = 0.0035;
+      const increment = this.sessionData.currentMultiplier * growthRate;
+      this.sessionData.currentMultiplier += increment;
 
       this.io.emit(
         SOCKET_EVENT_NAMES.emitters.game.broadcastCurrentMultiplier,
@@ -482,7 +482,7 @@ class GameSessionManager {
     this.sessionData.clientSeed = combinedClientSeed;
   };
 
-  addPlayerToSession = (bet: BetInMemory) => {
+  addPlayerToSession = (bet: SingleBet) => {
     this.sessionData.bets.push(bet);
   };
 }
