@@ -22,3 +22,82 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+
+
+
+  // Complex actions
+    onPlacebetSuccess: () =>
+      set(() => ({
+        isRequesting: false,
+        hasPlacedBet: true,
+        hasScheduledBet: false,
+      })),
+
+    onCashoutSucessOrFailure: () =>
+      set(() => ({
+        isRequesting: false,
+        hasPlacedBet: false,
+        hasScheduledBet: false,
+      })),
+
+    onPlacebetFailure: () =>
+      set(() => ({
+        isRequesting: false,
+        hasPlacedBet: false,
+        hasScheduledBet: false,
+      })),
+
+    cashout: () =>
+      set(() => ({
+        isRequesting: true,
+      })),
+
+    scheduleBet: () =>
+      set(() => ({
+        hasScheduledBet: true,
+      })),
+
+    // Complex getter for bet status based on current game phase
+    getBetStatus: (currentPhase: GamePhase): BetStatus => {
+      const state = get();
+
+      const status = {
+        canPlaceBet: false,
+        canScheduleBet: false,
+        canCashout: false,
+        statusMessage: "",
+      };
+
+      if (state.isRequesting) {
+        return status;
+      }
+
+      switch (currentPhase) {
+        case GamePhase.BETTING:
+          status.canPlaceBet = !state.hasPlacedBet && !state.hasScheduledBet;
+          status.canScheduleBet = !state.hasScheduledBet;
+          status.statusMessage = state.hasScheduledBet
+            ? "Waiting for game to start"
+            : "Place your bet";
+          break;
+
+        case GamePhase.RUNNING:
+          status.canCashout = state.hasPlacedBet;
+          status.statusMessage = state.hasPlacedBet
+            ? "Click to cash out!"
+            : state.hasScheduledBet
+            ? "Waiting for next round"
+            : "Game in progress";
+          break;
+
+        case GamePhase.CRASHED:
+          status.canScheduleBet = !state.hasScheduledBet;
+          status.statusMessage = state.hasScheduledBet
+            ? "Bet scheduled for next round"
+            : "Game crashed";
+          break;
+      }
+
+      return status;
+    },
