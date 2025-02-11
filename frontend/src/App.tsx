@@ -66,7 +66,7 @@ function App() {
       <NavBar />
       <Toaster />
 
-      <div className="container mx-auto px-4 py-8">
+      {/* <div className="container mx-auto px-4 py-8">
         {isSocketConnecting ? (
           <div>connecting</div>
         ) : isSocketConnected ? (
@@ -84,7 +84,7 @@ function App() {
         ) : (
           <div>Unknown Error</div>
         )}
-      </div>
+      </div> */}
     </div>
   );
 }
